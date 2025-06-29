@@ -1,0 +1,34 @@
+# Порт, на котором будет слушать Spring Boot внутри контейнера
+server:
+  port: 8081
+
+spring:
+  application:
+    name: deal
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Настройка Springdoc OpenAPI
+springdoc:
+  api-docs:
+    # эндпоинт спецификации
+    path: /api-docs
+    packages-to-scan:
+      - com.deal.controllers
+
+  swagger-ui:
+    # URL, по которому доступен Swagger UI
+    path: /swagger-ui.html
+    # откуда UI берёт конфиг
+    url: /api-docs/swagger-config
