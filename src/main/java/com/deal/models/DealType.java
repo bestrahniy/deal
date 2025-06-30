@@ -17,7 +17,7 @@ import lombok.Data;
 public class DealType {
     
     @Id
-    @Column(name = "type_id", length = 30, nullable = false)
+    @Column(name = "id", length = 30, nullable = false)
     private String id;
 
     @Column(name = "name", nullable = false, columnDefinition = "text")
@@ -26,7 +26,6 @@ public class DealType {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
-    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "type_id")
+    @OneToMany(mappedBy = "type", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Deal> deals;
 }

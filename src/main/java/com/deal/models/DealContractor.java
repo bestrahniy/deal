@@ -6,12 +6,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
 @Data
 @Entity
 @Table(name = "deal_contractor")
 public class DealContractor {
     @Id
     @Column(name = "id", nullable = false, columnDefinition = "UUID")
+    @GeneratedValue
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,15 +37,19 @@ public class DealContractor {
     private boolean main = false;
 
     @Column(name = "create_date", nullable = false, columnDefinition = "timestamp")
+    @CreatedDate
     private Instant createDate = Instant.now();
 
     @Column(name = "modify_date", columnDefinition = "timestamp")
+    @LastModifiedDate
     private Instant modifyDate;
 
     @Column(name = "create_user_id", columnDefinition = "text")
+    @CreatedBy
     private String createUserId;
 
     @Column(name = "modify_user_id", columnDefinition = "text")
+    @LastModifiedBy
     private String modifyUserId;
 
     @Column(name = "is_active", nullable = false)

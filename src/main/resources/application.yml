@@ -1,4 +1,3 @@
-# Порт, на котором будет слушать Spring Boot внутри контейнера
 server:
   port: 8081
 
@@ -13,22 +12,22 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      ddl-auto: update
     show-sql: ${SPRING_JPA_SHOW_SQL:false}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-# Настройка Springdoc OpenAPI
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
 springdoc:
   api-docs:
-    # эндпоинт спецификации
     path: /api-docs
     packages-to-scan:
       - com.deal.controllers
 
   swagger-ui:
-    # URL, по которому доступен Swagger UI
     path: /swagger-ui.html
-    # откуда UI берёт конфиг
     url: /api-docs/swagger-config

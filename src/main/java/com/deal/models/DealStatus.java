@@ -26,7 +26,6 @@ public class DealStatus {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "status_id")
+    @OneToMany(mappedBy = "status", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Deal> deals;
 }

@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0002-insert-reference-data
+      author: ilya
+      changes:
+        - loadData:
+            tableName: currency
+            file: classpath:db/changelog/data/currency.csv
+            separator: ";"
+            encoding: UTF-8
+
+        - loadData:
+            tableName: deal_status
+            file: classpath:db/changelog/data/deal_status.csv
+            separator: ";"
+            encoding: UTF-8
+
+        - loadData:
+            tableName: deal_type
+            file: classpath:db/changelog/data/deal_type.csv
+            separator: ";"
+            encoding: UTF-8
+
+        - loadData:
+            tableName: contractor_role
+            file: classpath:db/changelog/data/contractor_role.csv
+            separator: ";"
+            encoding: UTF-8

@@ -1,15 +1,18 @@
 package com.deal.services;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.deal.DTO.DealSaveDto;
+import com.deal.DTO.DealStatusDto;
 import com.deal.models.Currency;
 import com.deal.models.Deal;
 import com.deal.models.DealContractor;
+import com.deal.models.DealStatus;
 import com.deal.models.DealSum;
 import com.deal.repository.ContractorToRoleRepository;
 import com.deal.repository.ContrantorRoleRepository;
@@ -46,10 +49,16 @@ public class DealService {
 
     @Transactional
     public Deal saveDeal(DealSaveDto dealSaveDto){
+        Deal deal;
+        if(dealSaveDto.getId() != null){
+            deal = dealRepository.findById(dealSaveDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException());
+        }else{
+            deal = new Deal();
+            deal.setStatus(dealStatusRepository.findById("DRAFT")
+                .orElseThrow());
+        }
 
-        Deal deal = new Deal();
-
-        deal.setId(dealSaveDto.getId());
         deal.setDescription(dealSaveDto.getDescription());
         deal.setAgreementNumber(dealSaveDto.getAgreementNumber());
         deal.setAgreementDate(dealSaveDto.getAgreementDate());
@@ -60,8 +69,6 @@ public class DealService {
             .findById(dealSaveDto.getTypeId())
                 .orElseThrow(() -> new EntityNotFoundException("type not found"))
         );
-
-        deal.setCloseDt(dealSaveDto.getCloseDt());
 
         deal.setSums(
             dealSaveDto.getSums().stream()
@@ -85,7 +92,6 @@ public class DealService {
             dealSaveDto.getContractors().stream()
                 .map(contractor -> {
                     DealContractor dealContractor = new DealContractor();
-                    dealContractor.setId(contractor.getId());
                     dealContractor.setDeal(deal);
                     dealContractor.setContractorId(contractor.getContractorId());
                     dealContractor.setName(contractor.getName());
@@ -97,6 +103,19 @@ public class DealService {
                 .collect(Collectors.toList())
         );
 
-    return dealRepository.save(deal);
+        return dealRepository.save(deal);
+    }
+
+
+    public void changeStatus(UUID dealId, DealStatusDto statusStatusdto){
+        // Deal deal = dealRepository.findById(dealId)
+        //     .orElseThrow(() -> new EntityNotFoundException("deal not found"));
+
+        // DealStatus dealStatus = new DealStatus();
+        // dealStatus.setId(statusStatusdto.getId());
+        // dealStatus.setName(statusStatusdto.getName());
+        // dealStatus.setActive(true);
+        // dealRepository.save(dealStatus);
+        // dealRepository.save(dealStatus);
     }
 }

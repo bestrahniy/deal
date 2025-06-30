@@ -7,12 +7,19 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
 @Data
 @Entity
 @Table(name = "deal")
 public class Deal {
+    
     @Id
     @Column(name = "id", nullable = false, columnDefinition = "UUID")
+    @GeneratedValue
     private UUID id;
 
     @Column(name = "description", columnDefinition = "text")
@@ -34,7 +41,6 @@ public class Deal {
     @JoinColumn(name = "type_id", nullable = false)
     private DealType type;
 
-    // связь на справочник статусов
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", nullable = false)
     private DealStatus status;
@@ -42,15 +48,19 @@ public class Deal {
     @Column(name = "close_dt", columnDefinition = "timestamp")
     private Instant closeDt;
 
-    @Column(name = "create_date", nullable = false, columnDefinition = "timestamp")
+    @CreatedDate
+    @Column(name = "create_date", columnDefinition = "timestamp", nullable = false)
     private Instant createDate = Instant.now();
 
+    @LastModifiedDate
     @Column(name = "modify_date", columnDefinition = "timestamp")
     private Instant modifyDate;
 
+    @CreatedBy
     @Column(name = "create_user_id", columnDefinition = "text")
     private String createUserId;
 
+    @LastModifiedBy
     @Column(name = "modify_user_id", columnDefinition = "text")
     private String modifyUserId;
 

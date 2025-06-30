@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
 
+import org.hibernate.engine.jdbc.env.spi.IdentifierCaseStrategy;
+
 @Data
 @Entity
 @Table(name = "deal_sum")
 public class DealSum {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
