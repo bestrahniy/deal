@@ -4,6 +4,6 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.deal.models.DealContractor;
 
-public interface DealContractorRepository extends JpaRepository<DealContractor, UUID>{
-    
+public interface DealContractorRepository extends JpaRepository<DealContractor, UUID> {
+
 }

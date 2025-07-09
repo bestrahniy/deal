@@ -15,7 +15,7 @@ import lombok.Data;
 @Entity
 @Table(name = "Currency")
 public class Currency {
-    
+
     @Id
     @Column(length = 3, nullable = false)
     private String id;
@@ -24,9 +24,10 @@ public class Currency {
     private String name;
 
     @Column(name = "is_active", nullable = false)
-    private boolean is_active = true;
+    private boolean isActive = true;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "currency_id")
     private List<DealSum> dealsums;
+
 }

@@ -1,6 +1,5 @@
 package com.deal.models;
 
-
 import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -10,13 +9,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "contractor_role")
+@AllArgsConstructor
+@NoArgsConstructor
 public class ContractorRole {
-    
+
     @Id
     @Column(name = "id", columnDefinition = "VARCHAR(30)", nullable = false, length = 30)
     private String id;
@@ -31,7 +34,7 @@ public class ContractorRole {
     private boolean isActive = true;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "contractor_id")
+    @JoinColumn(name = "role_id")
     private List<ContractorToRole> contractorToRoles;
 
 }

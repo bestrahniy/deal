@@ -6,7 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -15,7 +14,7 @@ import lombok.Data;
 @Data
 @Table(name = "deal_type")
 public class DealType {
-    
+
     @Id
     @Column(name = "id", length = 30, nullable = false)
     private String id;
@@ -28,4 +27,5 @@ public class DealType {
 
     @OneToMany(mappedBy = "type", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Deal> deals;
+
 }
