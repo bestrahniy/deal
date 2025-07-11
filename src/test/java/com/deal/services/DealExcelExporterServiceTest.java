@@ -54,10 +54,10 @@ public class DealExcelExporterServiceTest {
         ResponseDealByIdDto deal1 = new ResponseDealByIdDto();
         deal1.setId(UUID.fromString("22F31789-c3e6-4175-b626-217e68dc6544"));
         deal1.setDescription("Сделка №1");
-        deal1.setAgreementNumber("1234-12345");
-        deal1.setAgreementDate("01.01.2025");
-        deal1.setAgreementStartDt("02.01.2025");
-        deal1.setAvailabilityDate("01.01.2026");
+        deal1.setAgreement_number("1234-12345");
+        deal1.setAgreement_date("01.01.2025");
+        deal1.setAgreement_start_dt("02.01.2025");
+        deal1.setAvailability_date("01.01.2026");
         
         ResponseDealByIdDto.DealTypeDto type1 = new ResponseDealByIdDto.DealTypeDto();
         type1.setName("Кредитная");
@@ -79,10 +79,10 @@ public class DealExcelExporterServiceTest {
         ResponseDealByIdDto deal2 = new ResponseDealByIdDto();
         deal2.setId(UUID.fromString("8c9f66c0-f088-48ed-bf51-4be4959733ec"));
         deal2.setDescription("Сделка №2");
-        deal2.setAgreementNumber("564556-344");
-        deal2.setAgreementDate("01.01.2024");
-        deal2.setAgreementStartDt("02.01.2024");
-        deal2.setAvailabilityDate("01.01.2025");
+        deal2.setAgreement_number("564556-344");
+        deal2.setAgreement_date("01.01.2024");
+        deal2.setAgreement_start_dt("02.01.2024");
+        deal2.setAvailability_date("01.01.2025");
         
         ResponseDealByIdDto.DealTypeDto type2 = new ResponseDealByIdDto.DealTypeDto();
         type2.setName("Кредитная");

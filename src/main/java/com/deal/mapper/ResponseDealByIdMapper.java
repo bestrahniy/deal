@@ -34,12 +34,12 @@ public class ResponseDealByIdMapper {
         ResponseDealByIdDto dto = new ResponseDealByIdDto();
         dto.setId(deal.getId());
         dto.setDescription(deal.getDescription());
-        dto.setAgreementNumber(deal.getAgreementNumber());
-        dto.setAgreementDate(dateFormatter.format(deal.getAgreementDate()));
-        dto.setAgreementStartDt(dateTimeFormatter.format(deal.getAgreementStartDt()));
-        dto.setAvailabilityDate(dateFormatter.format(deal.getAvailabilityDate()));
+        dto.setAgreement_number(deal.getAgreementNumber());
+        dto.setAgreement_date(dateFormatter.format(deal.getAgreementDate()));
+        dto.setAgreement_start_dt(dateTimeFormatter.format(deal.getAgreementStartDt()));
+        dto.setAvailability_date(dateFormatter.format(deal.getAvailabilityDate()));
         if (deal.getCloseDt() != null) {
-            dto.setCloseDate(dateTimeFormatter.format(deal.getCloseDt()));
+            dto.setClose_date(dateTimeFormatter.format(deal.getCloseDt()));
         }
 
         dto.setType(

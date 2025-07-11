@@ -13,10 +13,10 @@ public class ResponseDealByIdDto {
 
     private UUID id;
     private String description;
-    private String agreementNumber;
-    private String agreementDate;
-    private String agreementStartDt;
-    private String availabilityDate;
+    private String agreement_number;
+    private String agreement_date;
+    private String agreement_start_dt;
+    private String availability_date;
     private DealTypeDto type;
     private DealStatusDto status;
 
@@ -36,7 +36,7 @@ public class ResponseDealByIdDto {
         private String name;
     }
 
-    private String closeDate;
+    private String close_date;
 
     private List<ContractorDto> contractors;
 
