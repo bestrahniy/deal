@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:17
+    container_name: deal_db
+    environment:
+      POSTGRES_DB: deal
+      POSTGRES_USER: ilya
+      POSTGRES_PASSWORD: ilya
+    ports:
+      - "5401:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: deal-app
+    depends_on:
+      - db
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL:      jdbc:postgresql://db:5432/deal
+      SPRING_DATASOURCE_USERNAME: ilya
+      SPRING_DATASOURCE_PASSWORD: ilya
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      SERVER_PORT: "8081"
+
+volumes:
+  db_data:
