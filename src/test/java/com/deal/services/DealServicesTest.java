@@ -66,9 +66,10 @@ public class DealServicesTest {
 
     @Test
     void changeStatusTest() {
-        DealStatusDto dto = new DealStatusDto();
-        dto.setDealId(UUID.randomUUID());
-        dto.setStatusId("ACTIVE");
+        DealStatusDto dto = DealStatusDto.builder()
+            .dealId(UUID.randomUUID())
+            .statusId("ACTIVE")
+            .build();
 
         Deal deal = new Deal();
         DealStatus newStatus = new DealStatus();

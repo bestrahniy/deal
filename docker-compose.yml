@@ -22,7 +22,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      SPRING_DATASOURCE_URL:      jdbc:postgresql://db:5432/deal
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/deal
       SPRING_DATASOURCE_USERNAME: ilya
       SPRING_DATASOURCE_PASSWORD: ilya
       SPRING_JPA_HIBERNATE_DDL_AUTO: update

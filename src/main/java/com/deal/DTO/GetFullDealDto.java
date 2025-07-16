@@ -3,9 +3,14 @@ package com.deal.Dto;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
+@AllArgsConstructor
 public class GetFullDealDto {
 
     private UUID id;
@@ -30,7 +35,7 @@ public class GetFullDealDto {
 
     @Data
     public static class GetFullDealType {
-        private UUID id;
+        private String id;
         private String name;
     }
 
