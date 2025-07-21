@@ -43,10 +43,10 @@ public class DealExcelExporterService {
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(deal.getId().toString());
             row.createCell(1).setCellValue(deal.getDescription() != null ? deal.getDescription() : "-");
-            row.createCell(2).setCellValue(deal.getAgreement_number() != null ? deal.getAgreement_number() : "-");
-            row.createCell(3).setCellValue(deal.getAgreement_date() != null ? deal.getAgreement_date() : "-");
-            row.createCell(4).setCellValue(deal.getAgreement_start_dt() != null ? deal.getAgreement_start_dt() : "-");
-            row.createCell(5).setCellValue(deal.getAvailability_date() != null ? deal.getAvailability_date() : "-");
+            row.createCell(2).setCellValue(deal.getAgreementNumber() != null ? deal.getAgreementNumber() : "-");
+            row.createCell(3).setCellValue(deal.getAgreementDate() != null ? deal.getAgreementDate() : "-");
+            row.createCell(4).setCellValue(deal.getAgreementStartDt() != null ? deal.getAgreementStartDt() : "-");
+            row.createCell(5).setCellValue(deal.getAvailabilityDate() != null ? deal.getAvailabilityDate() : "-");
             row.createCell(6).setCellValue(deal.getType() != null ? deal.getType().getName() : "-");
             row.createCell(7).setCellValue(deal.getStatus() != null ? deal.getStatus().getName() : "-");
 

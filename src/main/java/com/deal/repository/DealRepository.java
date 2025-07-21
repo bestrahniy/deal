@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import com.deal.models.Deal;
 import com.deal.models.DealContractor;
+import com.deal.models.DealType;
 
 public interface DealRepository extends JpaRepository<Deal, UUID>, JpaSpecificationExecutor<Deal> {
 
@@ -23,5 +24,7 @@ public interface DealRepository extends JpaRepository<Deal, UUID>, JpaSpecificat
         WHERE c.deal.id = :id AND c.isActive = true
         """)
     List<DealContractor> findContractorsWithRolesByDealId(@Param("id") UUID id);
+
+    List<Deal> findAllByType(DealType type);
 
 }
