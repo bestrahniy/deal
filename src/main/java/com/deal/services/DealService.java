@@ -30,6 +30,8 @@ import com.deal.repository.DealTypeRepository;
 import com.deal.specification.DealSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -82,6 +84,10 @@ public class DealService {
      * @return link on method for filling dto for showing deal on screen
      */
     @Transactional
+    @PostFilter("""
+            (!hasRole("CREDIT_USER") or filterObject.type.id == 'CREDIT') and
+            (!hasRole("OVERDRAFT_USER") or filterObject.type.id == 'OVERDRAFT')
+            """)
     public ResponseDealByIdDto responseDealById(UUID id) {
         Deal deal = dealRepository.findBaseDetailsById(id)
             .orElseThrow(() -> new EntityNotFoundException("Deal not found"));
@@ -100,6 +106,25 @@ public class DealService {
     @Transactional
     public Page<ResponseDealByIdDto> searchDeals(SearchDealFilterDto dto) {
         Specification<Deal> specification = DealSpecification.buildSearchSpecification(dto);
+
+        boolean creditUserRoleExists = SecurityContextHolder.getContext().getAuthentication()
+            .getAuthorities().stream()
+                .anyMatch(roles -> roles.getAuthority().equals("ROLE_CREDIT_USER"));
+
+        boolean overdraftUserRoleExists = SecurityContextHolder.getContext().getAuthentication()
+            .getAuthorities().stream()
+                .anyMatch(roles -> roles.getAuthority().equals("ROLE_OVERDRAFT_USER"));
+
+        if (creditUserRoleExists) {
+            specification = specification.and((root, query, cb) ->
+                cb.equal(root.get("type").get("id"), "CREDIT"));
+        }
+
+        if (overdraftUserRoleExists) {
+            specification = specification.and((root, query, cb) ->
+                cb.equal(root.get("type").get("id"), "OVERDRAFT"));
+        }
+
         Page<Deal> dealPage = dealRepository.findAll(specification, dto.getPageable());
         return dealPage.map(deal -> {
                 List<DealContractor> contractors = dealRepository.findContractorsWithRolesByDealId(deal.getId());
@@ -153,6 +178,10 @@ public class DealService {
      * @param deal entity
      * @return DealStatusDto
      */
+    @PostFilter("""
+            (!hasRole("CREDIT_USER") or filterObject.type.id == 'CREDIT') and
+            (!hasRole("OVERDRAFT_USER") or filterObject.type.id == 'OVERDRAFT')
+            """)
     public DealStatusDto getStatus(Deal deal) {
         return DealStatusDto.builder()
             .dealId(deal.getId())

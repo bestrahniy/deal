@@ -7,43 +7,45 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+
 import static org.mockito.BDDMockito.then;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
 import org.apache.commons.codec.DecoderException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+
+import com.deal.Dto.DealSaveDto;
+import com.deal.Dto.SearchDealFilterDto;
 import com.deal.Dto.UserRolesDto;
+import com.deal.models.Deal;
+import com.deal.repository.DealRepository;
+import com.deal.repository.DealStatusRepository;
+import com.deal.repository.DealTypeRepository;
 import com.deal.services.AuthConnect;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.persistence.EntityNotFoundException;
+
 import static org.mockito.BDDMockito.given;
 
-@SpringBootTest(
-    properties = {
-        "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost:0/.well-known/jwks.json",
-        "security.jwt.secret_key=b55a3f4a6400c4ef85c16187653713004986bace196af0d78c24b0d1ca26cd9a"
-    }
-)
+@SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
 public class UiSecurityIntegrationTest {
@@ -54,6 +56,15 @@ public class UiSecurityIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private DealRepository dealRepository;
+
+    @Autowired
+    private DealTypeRepository dealTypeRepository;
+
+    @Autowired
+    private DealStatusRepository dealStatusRepository;
+
     @MockBean
     private AuthConnect authConnect;
 
@@ -61,7 +72,7 @@ public class UiSecurityIntegrationTest {
 
     private int accessTokenExpiration = 3600000;
 
-    private String secretKey = "b55a3f4a6400c4ef85c16187653713004986bace196af0d78c24b0d1ca26cd9a";
+    private static String secretKey = "b55a3f4a6400c4ef85c16187653713004986bace196af0d78c24b0d1ca26cd9a";
 
     @Container
     private final static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"));
@@ -72,27 +83,13 @@ public class UiSecurityIntegrationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.liquibase.change-log", () ->  "classpath:db/changelog/db.changelog-master.yaml");
+        registry.add("security.jwt.secret_key", ()  -> secretKey);
     }
 
     @BeforeEach
     void init() throws DecoderException {
         byte[] keyBytes = org.apache.commons.codec.binary.Hex.decodeHex(secretKey.toCharArray());
         key = Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    @TestConfiguration
-    static class JwtDecoderConfig {
-
-        private String secretKey = "b55a3f4a6400c4ef85c16187653713004986bace196af0d78c24b0d1ca26cd9a";
-
-        @Bean
-        public JwtDecoder init() throws DecoderException {
-            byte[] keyBytes = org.apache.commons.codec.binary.Hex
-                            .decodeHex(secretKey.toCharArray());
-            return NimbusJwtDecoder
-                    .withSecretKey(new javax.crypto.spec.SecretKeySpec(keyBytes, "HmacSHA256"))
-                    .build();
-        }
     }
 
     private String createToken(Set<String> roles) {
@@ -111,7 +108,7 @@ public class UiSecurityIntegrationTest {
     @Test
     void whenNoToken_thenUnauthorized() throws Exception {
         mockMvc.perform(get("/ui/deals"))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -217,6 +214,15 @@ public class UiSecurityIntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(content().string("TEST_ACCESS_TOKEN"));
         then(authConnect).should().addRole(eq(adminJwt), refEq(dto));
+    }
+
+    @Test
+    void whenCheckRoles_thetReturnAllRolesFromToken() throws Exception {
+        String token = createToken(Set.of("USER", "SUPERUSER", "DEAL_SUPERUSER"));
+        mockMvc.perform(get("/ui/user-roles/{login}", "testUser")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.length()").value(3));
     }
 
 }

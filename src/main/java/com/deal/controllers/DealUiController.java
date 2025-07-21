@@ -10,25 +10,32 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.deal.services.AuthConnect;
+import com.deal.services.ContractorService;
 import com.deal.services.DealExcelExporterService;
 import com.deal.services.DealService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import com.deal.Dto.DealContractorSaveDto;
 import com.deal.Dto.DealSaveDto;
 import com.deal.Dto.DealStatusDto;
 import com.deal.Dto.GetFullDealDto;
@@ -53,6 +60,8 @@ public class DealUiController {
 
     private final AuthConnect authConnect;
 
+    private final ContractorService contractorService;
+
     @Operation(
         summary = "method for conntected with auth service",
         description = """
@@ -67,6 +76,10 @@ public class DealUiController {
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
     )
+    @PreAuthorize("""
+            hasRole('ADMIN') or hasRole('USER') or hasRole('CREDIT_USER')
+            or hasRole('OVERDRAFT_USER') or hasRole('DEAL_SUPERUSER') or
+            hasRole('SUPERUSER')""")
     @GetMapping("/deals")
     public List<GetFullDealDto> getAuthorisateUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -85,6 +98,10 @@ public class DealUiController {
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
     )
+    @PreAuthorize("""
+        hasRole('USER') or hasRole('CREDIT_USER') or hasRole('OVERDRAFT_USER')
+        or hasRole('DEAL_SUPERUSER') or hasRole('SUPERUSER')
+        """)
     @GetMapping("/deal/deal-status")
     public ResponseEntity<?> getDealStatus(@RequestBody Deal deal) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -104,6 +121,10 @@ public class DealUiController {
             @ApiResponse(responseCode = "404", description = "url not found"),
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
+    )
+    @PreAuthorize("""
+            hasRole('DEAL_SUPERUSER') or hasRole('SUPERUSER')
+            """
     )
     @PutMapping("/deal/save")
     public UUID saveDeal(@Valid @RequestBody DealSaveDto dealSaveDto) {
@@ -128,6 +149,10 @@ public class DealUiController {
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
     )
+    @PreAuthorize("""
+            hasRole('DEAL_SUPERUSER') or hasRole('SUPERUSER')
+            """
+    )
     @PatchMapping("/deal/change/status")
     public ResponseEntity<?> changeStatus(@Valid @RequestBody DealStatusDto dealStatusDto) {
         dealService.changeStatus(dealStatusDto);
@@ -144,6 +169,10 @@ public class DealUiController {
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
     )
+    @PreAuthorize("""
+        hasRole('USER') or hasRole('CREDIT_USER') or hasRole('OVERDRAFT_USER')
+        or hasRole('DEAL_SUPERUSER') or hasRole('SUPERUSER')
+        """)
     @GetMapping("/deal/{id}")
     public ResponseEntity<ResponseDealByIdDto> responseDeal(@PathVariable UUID id) {
         return ResponseEntity.ok(dealService.responseDealById(id));
@@ -159,6 +188,10 @@ public class DealUiController {
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
     )
+    @PreAuthorize("""
+        hasRole('USER') or hasRole('CREDIT_USER') or hasRole('OVERDRAFT_USER')
+        or hasRole('DEAL_SUPERUSER') or hasRole('SUPERUSER')
+        """)
     @PostMapping("/deal/search")
     public ResponseEntity<Page<ResponseDealByIdDto>> searchDeals(
         @RequestBody SearchDealFilterDto dto,
@@ -178,6 +211,10 @@ public class DealUiController {
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
     )
+    @PreAuthorize("""
+        hasRole('USER') or hasRole('CREDIT_USER') or hasRole('OVERDRAFT_USER')
+        or hasRole('DEAL_SUPERUSER') or hasRole('SUPERUSER')
+        """)
     @PostMapping("/deal/search/export")
     public ResponseEntity<Resource> exportDeals(
         @RequestBody SearchDealFilterDto dto,
@@ -194,6 +231,47 @@ public class DealUiController {
     }
 
     @Operation(
+        summary = "save a new deal contractor",
+        description = """
+                save a new deal contractor use the
+                dealCnractorSaveDto
+                """,
+        responses = {
+            @ApiResponse(responseCode = "201", description = "created a new deal conractor"),
+            @ApiResponse(responseCode = "400", description = "incorrect data"),
+            @ApiResponse(responseCode = "404", description = "url not found"),
+            @ApiResponse(responseCode = "500", description = "server is badly")
+        }
+    )
+    @PreAuthorize("hasRole('DEAL_SUPERUSER') or hasRole('SUPERUSER')")
+    @PutMapping("/deal-contractor/save")
+    public ResponseEntity<?> saveContractor(@RequestBody DealContractorSaveDto dealContractorSaveDto) {
+        return ResponseEntity.ok(contractorService.saveDealContractor(dealContractorSaveDto));
+    }
+
+    @Operation(
+        summary = "logical delete deal contractor",
+        description = "variable is_active become false",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "logical delete is successfully"),
+            @ApiResponse(responseCode = "400", description = "incorrect data"),
+            @ApiResponse(responseCode = "404", description = "url not found"),
+            @ApiResponse(responseCode = "500", description = "server is badly")
+        }
+    )
+    @PreAuthorize("hasRole('SUPERUSER') or hasRole('DEAL_SUPERUSER')")
+    @DeleteMapping("/deal-contractor/delete/{id}")
+    public ResponseEntity<?> deleteDealContractor(
+        @Parameter(
+            description = "unique id of deal contractor",
+            example = "9afde06e-4c84-4b2c-b648-e88725e9aa28"
+        )
+        @PathVariable UUID id) {
+        contractorService.deleteDealContractor(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
         summary = "add new role to user",
         description = """
             send header request to auth service with current admin token,
@@ -207,6 +285,7 @@ public class DealUiController {
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
     )
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/user-roles/save")
     public ResponseEntity<?> saveNewRole(
         @RequestBody UserRolesDto userRolesDto,
@@ -225,6 +304,11 @@ public class DealUiController {
             @ApiResponse(responseCode = "500", description = "server is badly")
         }
     )
+    @PreAuthorize("""
+        hasRole('USER') or hasRole('CREDIT_USER') or hasRole('OVERDRAFT_USER')
+        or hasRole('DEAL_SUPERUSER') or hasRole('SUPERUSER') or hasRole('CONTRACTOR_RUS')
+        or hasRole('ADMIN') or hasRole('CONTRACTOR_SUPERUSER')
+        """)
     @GetMapping("/user-roles/{login}")
     public ResponseEntity<?> getMethodName(@PathVariable String login) {
         return ResponseEntity.ok(dealService.getAllUserRoles(login));
